@@ -123,6 +123,15 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'ArrowLeft') step(-1);
   else if (e.key === 'ArrowRight') step(1);
 });
+let lastWheel = 0;
+lb.addEventListener('wheel', e => {
+  if (!lb.classList.contains('open')) return;
+  e.preventDefault();               // don't scroll the page behind the lightbox
+  const now = Date.now();
+  if (now - lastWheel < 120) return; // throttle: ~one image per notch
+  lastWheel = now;
+  step(e.deltaY > 0 ? 1 : -1);       // wheel down = next, up = previous
+}, { passive: false });
 </script>
 </body>
 </html>
