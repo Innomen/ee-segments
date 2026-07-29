@@ -108,6 +108,7 @@ fetch('manifest.json?' + Date.now())
       frag.appendChild(cell);
     });
     grid.appendChild(frag);
+    postHeight();
   })
   .catch(e => { status.textContent = 'Could not load manifest.json (' + e + ').'; });
 
