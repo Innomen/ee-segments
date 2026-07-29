@@ -54,6 +54,12 @@
   #lb #close:hover { opacity: 1; }
   #lb #counter { position: absolute; bottom: 14px; left: 0; right: 0;
     text-align: center; color: #b8a888; font-size: 14px; }
+  /* embedded in an iframe: the frame is as tall as the whole gallery, so a
+     viewport-fixed lightbox would land far off screen. The host page tells us
+     which slice is actually visible and we pin the lightbox to that. */
+  html.embedded #lb { position: absolute; inset: auto 0 auto 0;
+    top: var(--lb-top, 0px); height: var(--lb-h, 100vh); }
+  html.embedded #lb img { max-height: calc(var(--lb-h, 100vh) * .88); }
 </style>
 </head>
 <body>
@@ -106,7 +112,7 @@ fetch('manifest.json?' + Date.now())
   .catch(e => { status.textContent = 'Could not load manifest.json (' + e + ').'; });
 
 function open(i) { idx = i; show(); lb.classList.add('open'); }
-function close() { lb.classList.remove('open'); lbimg.src = ''; }
+function close() { lb.classList.remove('open'); lbimg.src = ''; postHeight(); }
 function show() {
   lbimg.src = encodeURI(images[idx]);
   counter.textContent = (idx + 1) + ' / ' + images.length;
