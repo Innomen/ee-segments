@@ -57,6 +57,8 @@
   /* embedded in an iframe: the frame is as tall as the whole gallery, so a
      viewport-fixed lightbox would land far off screen. The host page tells us
      which slice is actually visible and we pin the lightbox to that. */
+  /* the host page supplies its own heading, so ours would just be a duplicate */
+  html.embedded header { display: none; }
   html.embedded #lb { position: absolute; inset: auto 0 auto 0;
     top: var(--lb-top, 0px); height: var(--lb-h, 100vh); }
   html.embedded #lb img { max-height: calc(var(--lb-h, 100vh) * .88); }
