@@ -139,6 +139,39 @@ lb.addEventListener('wheel', e => {
   lastWheel = now;
   step(e.deltaY > 0 ? 1 : -1);       // wheel down = next, up = previous
 }, { passive: false });
+
+/* ---- embed support -------------------------------------------------------
+   Inside an iframe this page reports its own height so the host can size the
+   frame instead of guessing, and the host replies with the slice of the frame
+   currently on screen so the lightbox lands where the reader is looking.
+   Both messages carry a source tag; anything else is ignored. Standalone
+   viewing is untouched. */
+const framed = window.parent !== window;
+let lastHeight = 0;
+
+function postHeight() {
+  if (!framed) return;
+  if (lb.classList.contains('open')) return;  // the absolute lightbox would feed back
+  const h = Math.ceil(document.documentElement.getBoundingClientRect().height);
+  if (h === lastHeight) return;
+  lastHeight = h;
+  parent.postMessage({ source: 'ee-segments', type: 'height', height: h }, '*');
+}
+
+if (framed) {
+  document.documentElement.classList.add('embedded');
+  addEventListener('resize', postHeight);
+  addEventListener('load', postHeight);
+  if (window.ResizeObserver) new ResizeObserver(postHeight).observe(document.body);
+  addEventListener('message', e => {
+    const d = e.data;
+    if (!d || d.source !== 'ee-segments-host' || d.type !== 'viewport') return;
+    const root = document.documentElement.style;
+    root.setProperty('--lb-top', Math.round(d.top) + 'px');
+    root.setProperty('--lb-h', Math.round(d.height) + 'px');
+  });
+  parent.postMessage({ source: 'ee-segments', type: 'ready' }, '*');
+}
 </script>
 </body>
 </html>
